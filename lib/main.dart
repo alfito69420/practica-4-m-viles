@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:p4pmsn/extras/navbar.dart';
 import 'package:p4pmsn/extras/notification_methods.dart';
+import 'package:p4pmsn/screen/historial_screen.dart';
 import 'package:p4pmsn/screen/reservaciones_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -25,15 +27,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: ReservacionesScreen(),
-      //initialRoute: '/eventos', // Ruta inicial
-      // routes: {
-      //   '/nav': (context) => NavigationBarApp(),
-      //   '/eventos': (context) => EventosScreen(),
-      //   '/historial': (context) => HistorialRentasScreen(), // Ruta para la pantalla de historial de rentas
-      //   '/detalleR': (context) => DetalleRentaScreen(), // Ruta para la pantalla de detalle de renta
-      //   '/agregarRenta': (context)=> AgregarRentaScreen(),
-      // },
+      home: Navbar(),
+      initialRoute: '/calendario', // Ruta inicial
+      routes: {
+        '/nav': (context) => Navbar(),
+        '/calendario': (context) => ReservacionesScreen(),
+        '/historial': (context) => HistorialScreen(), // Ruta para la pantalla de historial de rentas
+        // '/detalleR': (context) => DetalleRentaScreen(), // Ruta para la pantalla de detalle de renta
+        // '/agregarRenta': (context)=> AgregarRentaScreen(),
+      },
     );
   }
 }
