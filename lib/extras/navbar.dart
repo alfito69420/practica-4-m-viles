@@ -13,31 +13,72 @@ class _NavigationBarAppState extends State<Navbar> {
   int selectedIndex = 0;
   final screens = [ReservacionesScreen(), HistorialScreen()];
 
+  // Clave para el Scaffold
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          'Reservaciones',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF64CCF2),
+        leading: IconButton(
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer(); // Abre el drawer
+          },
+          icon: const Icon(
+            Icons.menu,
+            color: Colors.white,
+          ),
+        ),
+/*        actions: [
+          GestureDetector(
+            onTap: () {},
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.ads_click_sharp,
+                ),
+              ),
+            ),
+          ),
+        ],*/
+      ),
       body: IndexedStack(
         index: selectedIndex,
         children: screens,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF64CCF2),
-        currentIndex: selectedIndex,
-        elevation: 0,
-        onTap: (value) {
-          setState(() {
-            selectedIndex = value;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month,color: Colors.white,),
-            label: 'Calendario',
+      drawer: myDrawer(),
+    );
+  }
+
+  Widget myDrawer() {
+    return Drawer(
+      child: ListView(
+        children: [
+          UserAccountsDrawerHeader(
+            currentAccountPicture: ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: const Image(image: AssetImage("assets/airbnb.jpg"))),
+            accountName: const Text("AirB&B"),
+            accountEmail: const Text("Practica 4"),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history, color: Colors.white),
-            label: 'Historial',
-          )
+          ListTile(
+            onTap: () {
+              Navigator.pushNamed(context, "/historial");
+            },
+            title: const Text("Historial"),
+            subtitle: const Text("Tus eventos pendientes"),
+            leading: const Icon(Icons.history),
+            trailing: const Icon(Icons.arrow_forward_ios_sharp),
+          ),
         ],
       ),
     );
