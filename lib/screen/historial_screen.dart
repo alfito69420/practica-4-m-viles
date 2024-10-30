@@ -46,10 +46,11 @@ class _HistorialScreenState extends State<HistorialScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(
+        centerTitle: true,
+        iconTheme: const IconThemeData(
               color: Colors.white,
             ),
-        title: Text(
+        title: const Text(
           'Historial de Reservaciones',
           style: TextStyle(color: Colors.white),
         ),
@@ -91,9 +92,9 @@ class _HistorialScreenState extends State<HistorialScreen> {
                                 );
                               },
                               child: Container(
-                                margin: EdgeInsets.symmetric(
+                                margin: const EdgeInsets.symmetric(
                                     vertical: 8, horizontal: 16),
-                                padding: EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(28),
                                   color: Colors.white,
@@ -105,7 +106,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                                           1, // Radio de propagación de la sombra
                                       blurRadius:
                                           3, // Radio de desenfoque de la sombra
-                                      offset: Offset(0,
+                                      offset: const Offset(0,
                                           2), // Desplazamiento horizontal y vertical de la sombra
                                     )
                                   ],
@@ -121,9 +122,9 @@ class _HistorialScreenState extends State<HistorialScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text('Reservación #${reserv.id_reservacion}',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 fontWeight: FontWeight.bold)),
-                                        SizedBox(height: 8),
+                                        const SizedBox(height: 8),
                                         Text(
                                             'Fecha inicio: $fechaInicioFormatted'),
                                         Text(
@@ -317,7 +318,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
     final txtEstatus = DropdownButtonFormField<String>(
         value: (conEstatus.text.isEmpty) ? null : conEstatus.text,
-        hint: Text('Seleccione el estatus'),
+        hint: const Text('Seleccione el estatus'),
         items: <String>['Confirmada', 'Iniciada', 'Finalizada', 'Cancelada']
             .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
@@ -334,7 +335,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
     final txtUsuario = DropdownButtonFormField<String>(
         value: (conUsuario.text.isEmpty) ? null : conUsuario.text,
-        hint: Text('Seleccione un usuario'),
+        hint: const Text('Seleccione un usuario'),
         items: clientes.map<DropdownMenuItem<String>>((value) {
           return DropdownMenuItem<String>(
             value: value.id_usuario.toString(),
@@ -356,7 +357,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
           return null;
         },
         value: (conAirbnb.text.isEmpty) ? null : conAirbnb.text,
-        hint: Text('Seleccione una AirBnB'),
+        hint: const Text('Seleccione una AirBnB'),
         items: airs.map<DropdownMenuItem<String>>((value) {
           return DropdownMenuItem<String>(
             value: value.id_airbnb.toString(),
@@ -425,7 +426,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
         icon: const Icon(Icons.save),
         label: const Text('Actualizar'));
 
-    final space = SizedBox(
+    const space = SizedBox(
       height: 10,
     );
 
@@ -441,7 +442,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Fechas',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
@@ -460,7 +461,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                     Expanded(
                       child: Column(
                         children: [
-                          Text(
+                          const Text(
                             'Estatus',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                           ),
@@ -474,7 +475,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                     Expanded(
                       child: Column(
                         children: [
-                          Text(
+                          const Text(
                             'Habitaciones',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                           ),
@@ -488,7 +489,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                 ),
                 space,
                 space,
-                Text(
+                const Text(
                   'Usuario',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
@@ -498,7 +499,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
                 ),
                 space,
                 space,
-                Text(
+                const Text(
                   'AirBnB',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
@@ -544,7 +545,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
     return CircleAvatar(
       radius: 30,
       backgroundColor: color,
-      child: CircleAvatar(
+      child: const CircleAvatar(
         radius: 22,
         backgroundColor: Colors.white,
       ),

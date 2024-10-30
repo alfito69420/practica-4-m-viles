@@ -142,9 +142,14 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                     markerDecoration: BoxDecoration(
                         color: Colors.black54, shape: BoxShape.circle),
                     selectedDecoration: BoxDecoration(
-                      color: Color(0xFF30BCED),
+                      color: Color(0xFF2197E1),
+                      //color: Colors.amberAccent),
                       shape: BoxShape.circle,
                     ),
+                    todayDecoration: BoxDecoration(
+                      color: Color(0xFF30BCED),
+                      shape: BoxShape.circle,
+                    )
                   ),
                   selectedDayPredicate: (day) {
                     return isSameDay(_selectedDay, day);

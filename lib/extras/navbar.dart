@@ -21,6 +21,7 @@ class _NavigationBarAppState extends State<Navbar> {
         children: screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF64CCF2),
         currentIndex: selectedIndex,
         elevation: 0,
         onTap: (value) {
@@ -28,13 +29,13 @@ class _NavigationBarAppState extends State<Navbar> {
             selectedIndex = value;
           });
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
+            icon: Icon(Icons.calendar_month,color: Colors.white,),
             label: 'Calendario',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.history),
+            icon: Icon(Icons.history, color: Colors.white),
             label: 'Historial',
           )
         ],
