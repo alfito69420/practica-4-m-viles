@@ -43,6 +43,12 @@ class NotificationService {
       String? body,
       String? payLoad,
       required DateTime scheduledNotificationDateTime}) async {
+        print(
+          tz.TZDateTime.from(
+            scheduledNotificationDateTime,
+            tz.local,
+          ),
+        );
     return notificationsPlugin.zonedSchedule(
         id,
         title,
@@ -53,7 +59,6 @@ class NotificationService {
         ),
         await notificationDetails(),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime);
   }
 }

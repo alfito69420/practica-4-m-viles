@@ -39,7 +39,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
   AirbnbDatabase? airbnbDatabase;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final conCategoria = TextEditingController();
-  var id_categoria = -1;
+  Future<List<AirbnbModel>>? _futureAirbnb;
 
   static const MethodChannel platform =
       MethodChannel('com.example.app/timezone');
@@ -448,16 +448,14 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
     conFechaIni.text = _selectedDay.toString().split(' ')[0];
 
     if (reservacion != null) {
+      final airbnbb = await AirbnbDatabase().getAirbnb(reservacion.id_airbnb!);
       conUsuario.text = reservacion.id_usuario!.toString();
       conAirbnb.text = reservacion.id_airbnb!.toString();
-      conFechaIni.text =
-          DateFormat('yyyy-MM-dd').format(reservacion.fecha_ini!.toLocal());
-      conHoraIni.text =
-          DateFormat('h:mm a').format(reservacion.fecha_ini!.toLocal());
-      conFechaFini.text =
-          DateFormat('yyyy-MM-dd').format(reservacion.fecha_fini!.toLocal());
-      conHoraFini.text =
-          DateFormat('h:mm a').format(reservacion.fecha_fini!.toLocal());
+      conCategoria.text = airbnbb!.id_categoria.toString();
+      conFechaIni.text = DateFormat('yyyy-MM-dd').format(reservacion.fecha_ini!.toLocal());
+      conHoraIni.text = DateFormat('h:mm a').format(reservacion.fecha_ini!.toLocal());
+      conFechaFini.text = DateFormat('yyyy-MM-dd').format(reservacion.fecha_fini!.toLocal());
+      conHoraFini.text = DateFormat('h:mm a').format(reservacion.fecha_fini!.toLocal());
       // conFechaIni.text = reservacion.fecha_evento!.split(' ')[0];
       // conFechaFini.text = reservacion.fecha_evento!;
       // conHora.text = reservacion.fecha_evento!.split(' ')[1];
@@ -512,6 +510,8 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
           print('texto antes de: ${conCategoria.text}');
           conCategoria.text = value!;
           print('texto después de: ${conCategoria.text}');
+          _futureAirbnb = AirbnbDatabase().getAirbnbByCategoria(int.parse(conCategoria.text));
+          print('newFutureAirbnb: ${_futureAirbnb.toString()}');
         });
       }
     );
@@ -656,25 +656,30 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
               time.hour,
               time.minute,
             );
-            print(scheduledDate);
+            print('Fecha de notif ${scheduledDate}');
             if (DateTime.now().isBefore(scheduledDate)) {
               NotificationService().scheduleNotification(
                   title: 'Evento próximo',
-                  body:
-                      'Faltan 2 días para que se consuma la reservacion de ${selectedUser!.nombre} ${selectedUser!.apellido}',
+                  body: 'Faltan 2 días para que se consuma la reservacion de ${selectedUser!.nombre} ${selectedUser!.apellido}',
                   scheduledNotificationDateTime: scheduledDate);
             }
-            final horaIni24hrs = DateFormat('HH:mm:ss')
-                .format(DateFormat('hh:mm a').parse(conHoraIni.text));
-            final horaFini24hrs = DateFormat('HH:mm:ss')
-                .format(DateFormat('hh:mm a').parse(conHoraFini.text));
+            final horaIni24hrs = DateFormat('HH:mm:ss').format(DateFormat('hh:mm a').parse(conHoraIni.text));
+            final horaFini24hrs = DateFormat('HH:mm:ss').format(DateFormat('hh:mm a').parse(conHoraFini.text));
+            String status = '';
+            DateTime fechaIni = DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs);
+            DateTime fechaFini = DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs);
+            if(DateTime.now().isBefore(fechaIni) && DateTime.now().isBefore(fechaFini)){
+              status = 'Confirmada';
+            } else if (DateTime.now().isAfter(fechaIni) && DateTime.now().isBefore(fechaFini)) {
+              status = 'Iniciada';
+            } else if (DateTime.now().isAfter(fechaIni) && DateTime.now().isAfter(fechaFini)) {
+              status = 'Finalizada';
+            }
             if (reservacion == null) {
               ReservacionModel reserv = ReservacionModel(
-                fecha_ini:
-                    DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs),
-                fecha_fini:
-                    DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
-                estatus: 'Confirmada',
+                fecha_ini: fechaIni,
+                fecha_fini: fechaFini,
+                estatus: status,
                 habitaciones: 1,
                 id_usuario: int.parse(conUsuario.text),
                 id_airbnb: int.parse(conAirbnb.text),
@@ -709,11 +714,9 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
               // EDIT
               ReservacionModel reserv = ReservacionModel(
                 id_reservacion: reservacion.id_reservacion,
-                fecha_ini:
-                    DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs),
-                fecha_fini:
-                    DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
-                estatus: 'Confirmada',
+                fecha_ini: fechaIni,
+                fecha_fini: fechaFini,
+                estatus: status,
                 habitaciones: 1,
                 id_usuario: int.parse(conUsuario.text),
                 id_airbnb: int.parse(conAirbnb.text),
@@ -785,12 +788,9 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 StatefulBuilder(
                   builder:(context, StateSetter setState) {
                     if (conCategoria.text.isEmpty) {
-                      print('La data: yesss nooon');
-                      return SizedBox(
-                        height: 20,
-                      );
+                      return SizedBox(height: 20,);
                     } else {
-                      print('La data: yesss wi');
+                      print('La data: Borra la cuenta');
                       return FutureBuilder(
                         key: ValueKey(conCategoria.text.toString()),
                         future: AirbnbDatabase().getAirbnbByCategoria(int.parse(conCategoria.text)),

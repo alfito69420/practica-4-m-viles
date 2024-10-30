@@ -29,13 +29,11 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: Navbar(),
-      initialRoute: '/calendario', // Ruta inicial
       routes: {
         '/nav': (context) => Navbar(),
         '/calendario': (context) => ReservacionesScreen(),
-        '/historial': (context) => HistorialScreen(), // Ruta para la pantalla de historial de rentas
-        '/reservacion': (context) => DetalleReservacionScreen(), // Ruta para la pantalla de detalle de renta
-        // '/agregarRenta': (context)=> AgregarRentaScreen(),
+        '/historial': (context) => HistorialScreen(), // Ruta para la pantalla de historial
+        '/reservacion': (context) => DetalleReservacionScreen(), // Ruta para la pantalla de detalle
       },
     );
   }
