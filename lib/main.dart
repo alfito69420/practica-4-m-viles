@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:p4pmsn/extras/navbar.dart';
 import 'package:p4pmsn/extras/notification_methods.dart';
+import 'package:p4pmsn/screen/detalle_reservacion_screen.dart';
 import 'package:p4pmsn/screen/historial_screen.dart';
 import 'package:p4pmsn/screen/reservaciones_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         '/nav': (context) => Navbar(),
         '/calendario': (context) => ReservacionesScreen(),
         '/historial': (context) => HistorialScreen(), // Ruta para la pantalla de historial de rentas
-        // '/detalleR': (context) => DetalleRentaScreen(), // Ruta para la pantalla de detalle de renta
+        '/reservacion': (context) => DetalleReservacionScreen(), // Ruta para la pantalla de detalle de renta
         // '/agregarRenta': (context)=> AgregarRentaScreen(),
       },
     );

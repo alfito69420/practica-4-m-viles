@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinner_time_picker/flutter_spinner_time_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:p4pmsn/database/airbnb_database.dart';
+import 'package:p4pmsn/database/categoria_database.dart';
 import 'package:p4pmsn/database/reservacion_database.dart';
 import 'package:p4pmsn/database/usuario_database.dart';
 import 'package:p4pmsn/extras/app_notifier.dart';
 import 'package:p4pmsn/extras/extras.dart';
 import 'package:p4pmsn/extras/notification_methods.dart';
 import 'package:p4pmsn/model/airbnb_model.dart';
+import 'package:p4pmsn/model/categoria_model.dart';
 import 'package:p4pmsn/model/reservacion_model.dart';
 import 'package:p4pmsn/model/usuario_model.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -35,14 +37,15 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
   ReservacionDatabase? reservacionDB;
   UsuarioDatabase? usuarioDatabase;
   AirbnbDatabase? airbnbDatabase;
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final conCategoria = TextEditingController();
+  var id_categoria = -1;
 
   static const MethodChannel platform =
       MethodChannel('com.example.app/timezone');
 
-  late tz.Location
-      _local; // Almacenar la ubicación de la zona horaria
+  late tz.Location _local; // Almacenar la ubicación de la zona horaria
+  late List<CategoriaModel> categorias = [];
 
   @override
   void initState() {
@@ -52,6 +55,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
     usuarioDatabase = UsuarioDatabase();
     airbnbDatabase = AirbnbDatabase();
     cargarReservaciones();
+    cargarCategorias();
     _selectedDay = _focusedDay;
 
     super.initState();
@@ -78,6 +82,14 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         'America/Mexico_City'); // Obtener la ubicación de la zona horaria de México
     tz.setLocalLocation(
         _local); // Establecer la ubicación local en la zona horaria de México
+  }
+
+  void cargarCategorias() async {
+    CategoriaDatabase categoriaDB = CategoriaDatabase();
+    List<CategoriaModel> listCategorias = await categoriaDB.getCategorias();
+    setState(() {
+      categorias = listCategorias;
+    });
   }
 
   @override
@@ -161,8 +173,8 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                     child: FutureBuilder(
                       future: reservacionDB!.getReservacionesByFecha(
                           _selectedDay.toString().split(' ')[0]),
-                      builder:
-                          (context, AsyncSnapshot<List<ReservacionModel>> snapshot) {
+                      builder: (context,
+                          AsyncSnapshot<List<ReservacionModel>> snapshot) {
                         if (snapshot.hasError) {
                           return Center(
                             child: Text(snapshot.error.toString()),
@@ -178,166 +190,208 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                                   final reservacion = snapshot.data![index];
                                   //snapshot.data![index];
                                   return FutureBuilder<UsuarioModel?>(
-                                    future: usuarioDatabase!.getUsuario(reservacion.id_usuario!),
-                                    builder: (context, userSnapshot) {
-                                      if (userSnapshot.hasError) {
-                                        return Center(
-                                          child: Text(userSnapshot.error.toString()),
-                                        );
-                                      } else {
-                                        if (userSnapshot.hasData) {
-                                          return Container(
-                                            margin: EdgeInsets.symmetric(vertical: 10),
-                                            decoration: BoxDecoration(
-                                              border:
-                                                  Border.all(color: Colors.grey[300]!),
-                                              borderRadius: BorderRadius.only(
-                                                topRight: Radius.circular(20),
-                                                topLeft: Radius.circular(20),
-                                                bottomRight: Radius.circular(10),
-                                                bottomLeft: Radius.circular(10),
-                                              ),
-                                            ),
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.all(15),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment.start,
-                                                          children: [
-                                                            Text(
-                                                              'Reservación de ${userSnapshot.data!.nombre!} ${userSnapshot.data!.apellido!}',
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight.bold,
-                                                              ),
-                                                              overflow: TextOverflow.ellipsis,
-                                                              maxLines: 1,
-                                                            ),
-                                                            SizedBox(
-                                                              height: 10,
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Icon(Icons.timer_sharp),
-                                                                Text(
-                                                                  DateFormat('HH:mm').format(snapshot.data![index].fecha_ini!)
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    PopupMenuButton<String>(
-                                                      elevation: 0,
-                                                      shadowColor: Colors.black,
-                                                      onSelected:
-                                                          (String result) async {
-                                                        if (result == "Ver") {
-                                                          _mostrarModalReservacion(
-                                                              snapshot.data![index]);
-                                                        }
-                                                        if (result == "Editar") {
-                                                          modalReservacion(context,
-                                                              snapshot.data![index]);
-                                                        }
-                                                        if (result == "Eliminar") {
-                                                          ArtDialogResponse response =
-                                                              await ArtSweetAlert.show(
-                                                                  barrierDismissible:
-                                                                      false,
-                                                                  context: context,
-                                                                  artDialogArgs: ArtDialogArgs(
-                                                                      denyButtonText:
-                                                                          "Cancelar",
-                                                                      title:
-                                                                          "¿Estás seguro?",
-                                                                      text:
-                                                                          "¡No podrás revertir esta acción!",
-                                                                      confirmButtonText:
-                                                                          "Si, borrar",
-                                                                      type:
-                                                                          ArtSweetAlertType
-                                                                              .warning));
-                                          
-                                                          if (response == null) {
-                                                            return;
-                                                          }
-                                                          if (response.isTapConfirmButton) {
-                                                            kReservs[snapshot.data![index].fecha_ini!]!.removeWhere(
-                                                              (element) => element.title == 'Reservación de ${userSnapshot.data!.nombre} ${userSnapshot.data!.apellido}'
-                                                            );
-                                                            reservacionDB!
-                                                                .deleteReservacion(snapshot
-                                                                    .data![index]
-                                                                    .id_reservacion!)
-                                                                .then((value) {
-                                                              if (value > 0) {
-                                                                ArtSweetAlert.show(
-                                                                    context: context,
-                                                                    artDialogArgs: ArtDialogArgs(
-                                                                        type:
-                                                                            ArtSweetAlertType
-                                                                                .success,
-                                                                        title:
-                                                                            "¡Borrado!"));
-                                                              }
-                                                              AppNotifier
-                                                                      .banEvents.value =
-                                                                  !AppNotifier
-                                                                      .banEvents.value;
-                                                            });
-                                                            return;
-                                                          }
-                                                        }
-                                                      },
-                                                      itemBuilder:
-                                                          (BuildContext context) =>
-                                                              <PopupMenuEntry<String>>[
-                                                        const PopupMenuItem<String>(
-                                                          value: "Ver",
-                                                          child: Text("Ver"),
-                                                        ),
-                                                        const PopupMenuItem<String>(
-                                                          value: "Editar",
-                                                          child: Text("Editar"),
-                                                        ),
-                                                        const PopupMenuItem<String>(
-                                                          value: "Eliminar",
-                                                          child: Text("Eliminar"),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                Container(
-                                                  height: 10,
-                                                  decoration: BoxDecoration(
-                                                    color: getRandomColor(),
-                                                    borderRadius: BorderRadius.only(
-                                                      bottomLeft: Radius.circular(20),
-                                                      bottomRight: Radius.circular(20),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                      future: usuarioDatabase!
+                                          .getUsuario(reservacion.id_usuario!),
+                                      builder: (context, userSnapshot) {
+                                        if (userSnapshot.hasError) {
+                                          return Center(
+                                            child: Text(
+                                                userSnapshot.error.toString()),
                                           );
                                         } else {
-                                          return const Center(
-                                            child: CircularProgressIndicator(),
-                                          );
+                                          if (userSnapshot.hasData) {
+                                            return Container(
+                                              margin: EdgeInsets.symmetric(
+                                                  vertical: 10),
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.grey[300]!),
+                                                borderRadius: BorderRadius.only(
+                                                  topRight: Radius.circular(20),
+                                                  topLeft: Radius.circular(20),
+                                                  bottomRight:
+                                                      Radius.circular(10),
+                                                  bottomLeft:
+                                                      Radius.circular(10),
+                                                ),
+                                              ),
+                                              child: Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  15),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                'Reservación de ${userSnapshot.data!.nombre!} ${userSnapshot.data!.apellido!}',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                maxLines: 1,
+                                                              ),
+                                                              SizedBox(
+                                                                height: 10,
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  Icon(Icons
+                                                                      .timer_sharp),
+                                                                  Text(DateFormat(
+                                                                          'HH:mm')
+                                                                      .format(snapshot
+                                                                          .data![
+                                                                              index]
+                                                                          .fecha_ini!)),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      PopupMenuButton<String>(
+                                                        elevation: 0,
+                                                        shadowColor:
+                                                            Colors.black,
+                                                        onSelected: (String
+                                                            result) async {
+                                                          if (result == "Ver") {
+                                                            _mostrarModalReservacion(
+                                                                snapshot.data![
+                                                                    index]);
+                                                          }
+                                                          if (result ==
+                                                              "Editar") {
+                                                            modalReservacion(
+                                                                context,
+                                                                snapshot.data![
+                                                                    index]);
+                                                          }
+                                                          if (result ==
+                                                              "Eliminar") {
+                                                            ArtDialogResponse response = await ArtSweetAlert.show(
+                                                                barrierDismissible:
+                                                                    false,
+                                                                context:
+                                                                    context,
+                                                                artDialogArgs: ArtDialogArgs(
+                                                                    denyButtonText:
+                                                                        "Cancelar",
+                                                                    title:
+                                                                        "¿Estás seguro?",
+                                                                    text:
+                                                                        "¡No podrás revertir esta acción!",
+                                                                    confirmButtonText:
+                                                                        "Si, borrar",
+                                                                    type: ArtSweetAlertType
+                                                                        .warning));
+
+                                                            if (response ==
+                                                                null) {
+                                                              return;
+                                                            }
+                                                            if (response
+                                                                .isTapConfirmButton) {
+                                                              kReservs[snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .fecha_ini!]!
+                                                                  .removeWhere((element) =>
+                                                                      element
+                                                                          .title ==
+                                                                      'Reservación de ${userSnapshot.data!.nombre} ${userSnapshot.data!.apellido}');
+                                                              reservacionDB!
+                                                                  .deleteReservacion(snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .id_reservacion!)
+                                                                  .then(
+                                                                      (value) {
+                                                                if (value > 0) {
+                                                                  ArtSweetAlert.show(
+                                                                      context:
+                                                                          context,
+                                                                      artDialogArgs: ArtDialogArgs(
+                                                                          type: ArtSweetAlertType
+                                                                              .success,
+                                                                          title:
+                                                                              "¡Borrado!"));
+                                                                }
+                                                                AppNotifier
+                                                                        .banEvents
+                                                                        .value =
+                                                                    !AppNotifier
+                                                                        .banEvents
+                                                                        .value;
+                                                              });
+                                                              return;
+                                                            }
+                                                          }
+                                                        },
+                                                        itemBuilder:
+                                                            (BuildContext
+                                                                    context) =>
+                                                                <PopupMenuEntry<
+                                                                    String>>[
+                                                          const PopupMenuItem<
+                                                              String>(
+                                                            value: "Ver",
+                                                            child: Text("Ver"),
+                                                          ),
+                                                          const PopupMenuItem<
+                                                              String>(
+                                                            value: "Editar",
+                                                            child:
+                                                                Text("Editar"),
+                                                          ),
+                                                          const PopupMenuItem<
+                                                              String>(
+                                                            value: "Eliminar",
+                                                            child: Text(
+                                                                "Eliminar"),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Container(
+                                                    height: 10,
+                                                    decoration: BoxDecoration(
+                                                      color: getRandomColor(),
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                        bottomLeft:
+                                                            Radius.circular(20),
+                                                        bottomRight:
+                                                            Radius.circular(20),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          } else {
+                                            return const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          }
                                         }
-                                      }
-                                    }
-                                  );
+                                      });
                                 },
                               ),
                             );
@@ -385,7 +439,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
     final conAirbnb = TextEditingController();
     final conFechaIni = TextEditingController();
     final conFechaFini = TextEditingController();
-    //final conFecha2 = TextEditingController();
+    //final conCategoria = TextEditingController();
     final conHoraIni = TextEditingController();
     final conHoraFini = TextEditingController();
     final _keyForm = GlobalKey<FormState>();
@@ -396,10 +450,14 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
     if (reservacion != null) {
       conUsuario.text = reservacion.id_usuario!.toString();
       conAirbnb.text = reservacion.id_airbnb!.toString();
-      conFechaIni.text = DateFormat('yyyy-MM-dd').format(reservacion.fecha_ini!.toLocal());
-      conHoraIni.text = DateFormat('h:mm a').format(reservacion.fecha_ini!.toLocal());
-      conFechaFini.text = DateFormat('yyyy-MM-dd').format(reservacion.fecha_fini!.toLocal());
-      conHoraFini.text = DateFormat('h:mm a').format(reservacion.fecha_fini!.toLocal());
+      conFechaIni.text =
+          DateFormat('yyyy-MM-dd').format(reservacion.fecha_ini!.toLocal());
+      conHoraIni.text =
+          DateFormat('h:mm a').format(reservacion.fecha_ini!.toLocal());
+      conFechaFini.text =
+          DateFormat('yyyy-MM-dd').format(reservacion.fecha_fini!.toLocal());
+      conHoraFini.text =
+          DateFormat('h:mm a').format(reservacion.fecha_fini!.toLocal());
       // conFechaIni.text = reservacion.fecha_evento!.split(' ')[0];
       // conFechaFini.text = reservacion.fecha_evento!;
       // conHora.text = reservacion.fecha_evento!.split(' ')[1];
@@ -426,30 +484,37 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         }).toList(),
         onChanged: (String? value) {
           conUsuario.text = value!;
-          selectedUser = usuarios.firstWhere((usuario) => usuario.id_usuario.toString() == value);
+          selectedUser = usuarios
+              .firstWhere((usuario) => usuario.id_usuario.toString() == value);
         });
 
-    AirbnbDatabase airbnbDB = AirbnbDatabase();
-    List<AirbnbModel> rentas = await airbnbDB.getAirbnbs();
+    //CategoriaDatabase categoriaDB = CategoriaDatabase();
+    //List<CategoriaModel> categorias = await categoriaDB.getCategorias();
+    print('categoriaaas: ${categorias}');
 
-    final txtAirbnb = DropdownButtonFormField<String>(
-        validator: (value) {
-          if (value == null) {
-            return 'Necesitas seleccionar un AirBnB';
-          }
-          return null;
-        },
-        value: (conAirbnb.text.isEmpty) ? null : conAirbnb.text,
-        hint: Text('Seleccione una AirBnB'),
-        items: rentas.map<DropdownMenuItem<String>>((value) {
-          return DropdownMenuItem<String>(
-            value: value.id_airbnb.toString(),
-            child: Text(value.descripcion.toString()),
-          );
-        }).toList(),
-        onChanged: (String? value) {
-          conAirbnb.text = value!;
+    final txtCategoria = DropdownButtonFormField<String>(
+      value: (conCategoria.text.isEmpty) ? null : conCategoria.text,
+      validator: (value) {
+        if (value == null) {
+          return 'Selecciona una categoría.';
+        }
+        return null;
+      },
+      hint: Text('Seleccione una categoría'),
+      items: categorias.map<DropdownMenuItem<String>>((value) {
+        return DropdownMenuItem<String>(
+          value: value.id_categoria.toString(),
+          child: Text(value.categoria.toString()),
+        );
+      }).toList(),
+      onChanged: (String? value) {
+        setState(() {
+          print('texto antes de: ${conCategoria.text}');
+          conCategoria.text = value!;
+          print('texto después de: ${conCategoria.text}');
         });
+      }
+    );
 
     final txtFechaIni = TextFormField(
         keyboardType: TextInputType.none,
@@ -482,34 +547,33 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         });
 
     final txtHoraIni = TextFormField(
-      keyboardType: TextInputType.none,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Necesitas ingresar una hora de inicio';
-        }
-        return null;
-      },
-      controller: conHoraIni,
-      decoration: const InputDecoration(
-        labelText: 'Hora Inicio',
-        prefixIcon: Icon(Icons.timer_outlined),
-        border: UnderlineInputBorder(),
-      ),
-      onTap: () async {
-        TimeOfDay selectedTime = TimeOfDay.now();
-        final pickedTime = await showSpinnerTimePicker(
-          context,
-          initTime: selectedTime,
-        );
+        keyboardType: TextInputType.none,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Necesitas ingresar una hora de inicio';
+          }
+          return null;
+        },
+        controller: conHoraIni,
+        decoration: const InputDecoration(
+          labelText: 'Hora Inicio',
+          prefixIcon: Icon(Icons.timer_outlined),
+          border: UnderlineInputBorder(),
+        ),
+        onTap: () async {
+          TimeOfDay selectedTime = TimeOfDay.now();
+          final pickedTime = await showSpinnerTimePicker(
+            context,
+            initTime: selectedTime,
+          );
 
-        if (pickedTime != null) {
-          setState(() {
-            selectedTime = pickedTime;
-            conHoraIni.text = pickedTime.format(context);
-          });
-        }
-      }
-    );
+          if (pickedTime != null) {
+            setState(() {
+              selectedTime = pickedTime;
+              conHoraIni.text = pickedTime.format(context);
+            });
+          }
+        });
 
     final txtFechaFini = TextFormField(
         keyboardType: TextInputType.none,
@@ -542,34 +606,33 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         });
 
     final txtHoraFini = TextFormField(
-      keyboardType: TextInputType.none,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Necesitas ingresar una hora final';
-        }
-        return null;
-      },
-      controller: conHoraFini,
-      decoration: const InputDecoration(
-        labelText: 'Hora Fin',
-        prefixIcon: Icon(Icons.timer_outlined),
-        border: UnderlineInputBorder(),
-      ),
-      onTap: () async {
-        TimeOfDay selectedTime = TimeOfDay.now();
-        final pickedTime = await showSpinnerTimePicker(
-          context,
-          initTime: selectedTime,
-        );
+        keyboardType: TextInputType.none,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Necesitas ingresar una hora final';
+          }
+          return null;
+        },
+        controller: conHoraFini,
+        decoration: const InputDecoration(
+          labelText: 'Hora Fin',
+          prefixIcon: Icon(Icons.timer_outlined),
+          border: UnderlineInputBorder(),
+        ),
+        onTap: () async {
+          TimeOfDay selectedTime = TimeOfDay.now();
+          final pickedTime = await showSpinnerTimePicker(
+            context,
+            initTime: selectedTime,
+          );
 
-        if (pickedTime != null) {
-          setState(() {
-            selectedTime = pickedTime;
-            conHoraFini.text = pickedTime.format(context);
-          });
-        }
-      }
-    );
+          if (pickedTime != null) {
+            setState(() {
+              selectedTime = pickedTime;
+              conHoraFini.text = pickedTime.format(context);
+            });
+          }
+        });
 
     final space = SizedBox(
       height: 10,
@@ -579,49 +642,55 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue[900], foregroundColor: Colors.white),
         onPressed: () {
-          selectedUser ??= usuarios.firstWhere((usuario) => usuario.id_usuario.toString() == conUsuario.text);
+          selectedUser ??= usuarios.firstWhere(
+              (usuario) => usuario.id_usuario.toString() == conUsuario.text);
           if (_keyForm.currentState!.validate()) {
-            final DateTime date = DateFormat('yyyy-MM-dd').parse(conFechaIni.text);
+            final DateTime date =
+                DateFormat('yyyy-MM-dd').parse(conFechaIni.text);
             final DateTime time = DateFormat('hh:mm a').parse(conHoraIni.text);
             // Combinar la fecha y la hora
             final DateTime scheduledDate = DateTime(
               date.year,
               date.month,
-              date.day - 2,  // Ajuste de días
+              date.day - 2, // Ajuste de días
               time.hour,
               time.minute,
             );
-          print(scheduledDate);
-          if(DateTime.now().isBefore(scheduledDate)){
-            NotificationService().scheduleNotification(
-            title: 'Evento próximo',
-            body: 'Faltan 2 días para que se consuma la reservacion de ${selectedUser!.nombre} ${selectedUser!.apellido}',
-            scheduledNotificationDateTime: scheduledDate);
-          }
-          final horaIni24hrs = DateFormat('HH:mm:ss').format(DateFormat('hh:mm a').parse(conHoraIni.text));
-          final horaFini24hrs = DateFormat('HH:mm:ss').format(DateFormat('hh:mm a').parse(conHoraFini.text));
+            print(scheduledDate);
+            if (DateTime.now().isBefore(scheduledDate)) {
+              NotificationService().scheduleNotification(
+                  title: 'Evento próximo',
+                  body:
+                      'Faltan 2 días para que se consuma la reservacion de ${selectedUser!.nombre} ${selectedUser!.apellido}',
+                  scheduledNotificationDateTime: scheduledDate);
+            }
+            final horaIni24hrs = DateFormat('HH:mm:ss')
+                .format(DateFormat('hh:mm a').parse(conHoraIni.text));
+            final horaFini24hrs = DateFormat('HH:mm:ss')
+                .format(DateFormat('hh:mm a').parse(conHoraFini.text));
             if (reservacion == null) {
               ReservacionModel reserv = ReservacionModel(
-                  fecha_ini: DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs),
-                  fecha_fini: DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
-                  estatus: 'Confirmada',
-                  habitaciones: 1,
-                  id_usuario: int.parse(conUsuario.text),
-                  id_airbnb: int.parse(conAirbnb.text),
+                fecha_ini:
+                    DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs),
+                fecha_fini:
+                    DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
+                estatus: 'Confirmada',
+                habitaciones: 1,
+                id_usuario: int.parse(conUsuario.text),
+                id_airbnb: int.parse(conAirbnb.text),
               );
               if (kReservs[DateTime.parse(conFechaIni.text)] == null) {
                 kReservs[DateTime.parse(conFechaIni.text)] = [];
               }
-              kReservs[DateTime.parse(conFechaIni.text)]!
-                  .add(Reservation('Reservación de ${selectedUser!.nombre} ${selectedUser!.apellido}'));
+              kReservs[DateTime.parse(conFechaIni.text)]!.add(Reservation(
+                  'Reservación de ${selectedUser!.nombre} ${selectedUser!.apellido}'));
 
               reservacionDB!.insertReservacion(reserv).then((value) {
                 Navigator.pop(context);
                 String msj = "";
                 var snackbar;
                 if (value > 0) {
-                  AppNotifier.banEvents.value =
-                      !AppNotifier.banEvents.value;
+                  AppNotifier.banEvents.value = !AppNotifier.banEvents.value;
                   msj = "Reservación insertada";
                   snackbar = SnackBar(
                     content: Text(msj),
@@ -636,30 +705,33 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 }
                 ScaffoldMessenger.of(context).showSnackBar(snackbar);
               });
-            } else { // EDIT
+            } else {
+              // EDIT
               ReservacionModel reserv = ReservacionModel(
-                  id_reservacion: reservacion.id_reservacion,
-                  fecha_ini: DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs),
-                  fecha_fini: DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
-                  estatus: 'Confirmada',
-                  habitaciones: 1,
-                  id_usuario: int.parse(conUsuario.text),
-                  id_airbnb: int.parse(conAirbnb.text),
+                id_reservacion: reservacion.id_reservacion,
+                fecha_ini:
+                    DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs),
+                fecha_fini:
+                    DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
+                estatus: 'Confirmada',
+                habitaciones: 1,
+                id_usuario: int.parse(conUsuario.text),
+                id_airbnb: int.parse(conAirbnb.text),
               );
-              kReservs[DateTime.parse(conFechaIni.text)]!
-                  .removeWhere((element) => element.title == 'Reservación de ${selectedUser!.nombre} ${selectedUser!.apellido}');
+              kReservs[DateTime.parse(conFechaIni.text)]!.removeWhere((element) =>
+                  element.title ==
+                  'Reservación de ${selectedUser!.nombre} ${selectedUser!.apellido}');
               if (kReservs[DateTime.parse(conFechaIni.text)] == null) {
                 kReservs[DateTime.parse(conFechaIni.text)] = [];
               }
-              kReservs[DateTime.parse(conFechaIni.text)]!
-                  .add(Reservation('Reservación de ${selectedUser!.nombre} ${selectedUser!.apellido}'));
+              kReservs[DateTime.parse(conFechaIni.text)]!.add(Reservation(
+                  'Reservación de ${selectedUser!.nombre} ${selectedUser!.apellido}'));
               reservacionDB!.updateReservacion(reserv).then((value) {
                 Navigator.pop(context);
                 String msj = "";
                 var snackbar;
                 if (value > 0) {
-                  AppNotifier.banEvents.value =
-                      !AppNotifier.banEvents.value;
+                  AppNotifier.banEvents.value = !AppNotifier.banEvents.value;
                   msj = "Reservación actualizada";
                   snackbar = SnackBar(
                     content: Text(msj),
@@ -703,12 +775,57 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 space,
                 space,
                 Text(
-                  'AirBnB',
+                  'Categorías',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 Container(
                   //padding: EdgeInsets.all(5),
-                  child: txtAirbnb,
+                  child: txtCategoria,
+                ),
+                StatefulBuilder(
+                  builder:(context, StateSetter setState) {
+                    if (conCategoria.text.isEmpty) {
+                      print('La data: yesss nooon');
+                      return SizedBox(
+                        height: 20,
+                      );
+                    } else {
+                      print('La data: yesss wi');
+                      return FutureBuilder(
+                        key: ValueKey(conCategoria.text.toString()),
+                        future: AirbnbDatabase().getAirbnbByCategoria(int.parse(conCategoria.text)),
+                        builder: (context, AsyncSnapshot<List<AirbnbModel>> snapshot) {
+                          if (snapshot.hasError) {
+                            return const Center(
+                              child: Text('Algo salió mal'),
+                            );
+                          } else {
+                            if (snapshot.hasData) {
+                              print('La data: ${snapshot.data!}');
+                              return Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      space,
+                                      space,
+                                      Text(
+                                        'AirBnB',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                      ),
+                                      airbnbSelect(conAirbnb, snapshot.data!),
+                                    ],
+                                  ),
+                              );
+                            } else {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                          }
+                        }
+                      );
+                    }
+                  },
                 ),
                 space,
                 space,
@@ -778,8 +895,10 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
     BuildContext modalContext = context;
 
     // Obtener detalles del usuario y airbnb de la reservación
-    UsuarioModel? usuarioReserv = await usuarioDatabase!.getUsuario(reservacion.id_usuario!);
-    AirbnbModel? airbnbReserv = await airbnbDatabase!.getAirbnb(reservacion.id_airbnb!);
+    UsuarioModel? usuarioReserv =
+        await usuarioDatabase!.getUsuario(reservacion.id_usuario!);
+    AirbnbModel? airbnbReserv =
+        await airbnbDatabase!.getAirbnb(reservacion.id_airbnb!);
 
     // Enviar notificación instantánea
 
@@ -898,6 +1017,41 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget airbnbSelect(conAirbnb, airbnb) {
+    return DropdownButtonFormField<String>(
+      validator: (value) {
+        if (value == null) {
+          return 'Necesitas seleccionar un AirBnB';
+        }
+        return null;
+      },
+      value: (conAirbnb.text.isEmpty) ? null : conAirbnb.text,
+      hint: Text('Seleccione una AirBnB'),
+      items: airbnb.map<DropdownMenuItem<String>>((value) {
+        return DropdownMenuItem<String>(
+          value: value.id_airbnb.toString(),
+          child: Text(value.descripcion.toString()),
+        );
+      }).toList(),
+      onChanged: (String? value) {
+        conAirbnb.text = value!;
+      },
+      selectedItemBuilder: (BuildContext context) {
+        return airbnb.map<Widget>((value) {
+          return Container(
+            width: double.infinity, // Asegúrate de que ocupe todo el ancho disponible
+            child: Text(
+              value.descripcion.toString(),
+              overflow: TextOverflow.ellipsis, // Aquí se configuran los puntos suspensivos
+              maxLines: 1, // Limita a una línea
+            ),
+          );
+        }).toList();
+      },
+      isExpanded: true,
     );
   }
 

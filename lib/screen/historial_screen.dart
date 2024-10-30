@@ -84,11 +84,11 @@ class _HistorialScreenState extends State<HistorialScreen> {
                                 dateFormatter.format(reserv.fecha_fini!);
                             return InkWell(
                               onTap: () {
-                                // Navigator.pushNamed(
-                                //   context,
-                                //   '/detalleR',
-                                //   arguments: reserv.id_reservacion,
-                                // );
+                                Navigator.pushNamed(
+                                  context,
+                                  '/reservacion',
+                                  arguments: reserv.id_reservacion,
+                                );
                               },
                               child: Container(
                                 margin: EdgeInsets.symmetric(
@@ -213,19 +213,19 @@ class _HistorialScreenState extends State<HistorialScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'btn2',
-        onPressed: () {
-          //Navigator.pushNamed(context, '/agregarRenta');
-        },
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        backgroundColor: Colors.blue[900],
-        shape: CircleBorder(),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: FloatingActionButton(
+      //   heroTag: 'btn2',
+      //   onPressed: () {
+      //     //Navigator.pushNamed(context, '/agregarRenta');
+      //   },
+      //   child: Icon(
+      //     Icons.add,
+      //     color: Colors.white,
+      //   ),
+      //   backgroundColor: Colors.blue[900],
+      //   shape: CircleBorder(),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
