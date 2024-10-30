@@ -76,12 +76,12 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
   }
 
   Future<void> configureLocalTimeZone() async {
-    tz.initializeTimeZones();
     // Establecer la zona horaria de México (América/Mexico_City)
-    _local = tz.getLocation(
-        'America/Mexico_City'); // Obtener la ubicación de la zona horaria de México
-    tz.setLocalLocation(
-        _local); // Establecer la ubicación local en la zona horaria de México
+    tz.initializeTimeZones();
+    // Obtener la ubicación de la zona horaria de México
+    _local = tz.getLocation('America/Mexico_City');
+    // Establecer la ubicación local en la zona horaria de México
+    tz.setLocalLocation(_local);
   }
 
   void cargarCategorias() async {
@@ -96,17 +96,18 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text(
           'Reservaciones',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.blue[900],
+        backgroundColor: const Color(0xFF64CCF2),
       ),
       body: ValueListenableBuilder(
         valueListenable: AppNotifier.banEvents,
         builder: (context, value, _) {
           return Container(
-            color: Colors.blue[900],
+            color: Colors.white,
             child: Column(
               children: [
                 TableCalendar(
@@ -116,33 +117,32 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                   focusedDay: _focusedDay,
                   calendarFormat: _calendarFormat,
                   eventLoader: _getReservsPerDay,
-                  locale: 'es_ES',
+                  locale: 'es_MX',
                   headerStyle: HeaderStyle(
                     formatButtonVisible: false,
                     titleCentered: true,
                     formatButtonTextStyle: const TextStyle().copyWith(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 15.0,
                     ),
                     formatButtonShowsNext: false,
                     titleTextStyle: const TextStyle(
                       fontSize: 20.0,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
-                    titleTextFormatter: (date, _) =>
-                        DateFormat('MMMM').format(date),
+                    titleTextFormatter: (date, _) => DateFormat.MMMM('es_MX').format(date),
                   ),
                   daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekdayStyle: TextStyle(color: Colors.white),
-                    weekendStyle: TextStyle(color: Colors.white),
+                    weekdayStyle: TextStyle(color: Colors.black),
+                    weekendStyle: TextStyle(color: Colors.black),
                   ),
                   calendarStyle: const CalendarStyle(
-                    defaultTextStyle: TextStyle(color: Colors.white),
-                    weekendTextStyle: TextStyle(color: Colors.white),
+                    defaultTextStyle: TextStyle(color: Colors.black),
+                    weekendTextStyle: TextStyle(color: Colors.black),
                     markerDecoration: BoxDecoration(
-                        color: Colors.white, shape: BoxShape.circle),
+                        color: Colors.black54, shape: BoxShape.circle),
                     selectedDecoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: Color(0xFF30BCED),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -183,7 +183,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                           if (snapshot.hasData) {
                             return Padding(
                               padding: const EdgeInsets.only(
-                                  left: 50, right: 50, top: 40, bottom: 20),
+                                  left: 30, right: 30, top: 40, bottom: 20),
                               child: ListView.builder(
                                 itemCount: snapshot.data!.length,
                                 itemBuilder: (context, index) {
@@ -201,18 +201,19 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                                         } else {
                                           if (userSnapshot.hasData) {
                                             return Container(
-                                              margin: const EdgeInsets.symmetric(
-                                                  vertical: 10),
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10),
                                               decoration: BoxDecoration(
                                                 border: Border.all(
-                                                    color: Colors.grey[300]!),
+                                                    color: Colors.grey!),
                                                 borderRadius: const BorderRadius.only(
                                                   topRight: Radius.circular(20),
                                                   topLeft: Radius.circular(20),
                                                   bottomRight:
-                                                      Radius.circular(10),
+                                                      Radius.circular(20),
                                                   bottomLeft:
-                                                      Radius.circular(10),
+                                                      Radius.circular(20),
                                                 ),
                                               ),
                                               child: Column(
@@ -368,19 +369,6 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                                                       ),
                                                     ],
                                                   ),
-                                                  Container(
-                                                    height: 10,
-                                                    decoration: BoxDecoration(
-                                                      color: getRandomColor(),
-                                                      borderRadius:
-                                                          const BorderRadius.only(
-                                                        bottomLeft:
-                                                            Radius.circular(20),
-                                                        bottomRight:
-                                                            Radius.circular(20),
-                                                      ),
-                                                    ),
-                                                  ),
                                                 ],
                                               ),
                                             );
@@ -413,7 +401,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         onPressed: () {
           modalReservacion(context, null);
         },
-        backgroundColor: Colors.blue[900],
+        backgroundColor:const Color(0xFF64CCF2),
         shape: const CircleBorder(),
         child: const Icon(
           Icons.add,
@@ -640,10 +628,9 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
 
     final btnAgregar = ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[900], foregroundColor: Colors.white),
+            backgroundColor: const Color(0xFF64CCF2), foregroundColor: Colors.white),
         onPressed: () {
-          selectedUser ??= usuarios.firstWhere(
-              (usuario) => usuario.id_usuario.toString() == conUsuario.text);
+          selectedUser ??= usuarios.firstWhere((usuario) => usuario.id_usuario.toString() == conUsuario.text);
           if (_keyForm.currentState!.validate()) {
             final DateTime date =
                 DateFormat('yyyy-MM-dd').parse(conFechaIni.text);
@@ -663,11 +650,13 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                   body: 'Faltan 2 días para que se consuma la reservacion de ${selectedUser!.nombre} ${selectedUser!.apellido}',
                   scheduledNotificationDateTime: scheduledDate);
             }
+
             final horaIni24hrs = DateFormat('HH:mm:ss').format(DateFormat('hh:mm a').parse(conHoraIni.text));
             final horaFini24hrs = DateFormat('HH:mm:ss').format(DateFormat('hh:mm a').parse(conHoraFini.text));
             String status = '';
             DateTime fechaIni = DateTime.parse('${conFechaIni.text} $horaIni24hrs');
             DateTime fechaFini = DateTime.parse('${conFechaFini.text} $horaFini24hrs');
+
             if(DateTime.now().isBefore(fechaIni) && DateTime.now().isBefore(fechaFini)){
               status = 'Confirmada';
             } else if (DateTime.now().isAfter(fechaIni) && DateTime.now().isBefore(fechaFini)) {
@@ -676,11 +665,13 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
               status = 'Finalizada';
             }
             if (reservacion == null) {
+              print("ALBBBBBBBBBBBBBBB"+conUsuario.text);
               ReservacionModel reserv = ReservacionModel(
-                fecha_ini: fechaIni,
-                fecha_fini: fechaFini,
-                estatus: status,
+                fecha_ini: DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs),
+                fecha_fini: DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
+                estatus: 'Confirmada',
                 habitaciones: 1,
+
                 id_usuario: int.parse(conUsuario.text),
                 id_airbnb: int.parse(conAirbnb.text),
               );
@@ -772,7 +763,6 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 Container(
-                  //padding: EdgeInsets.all(5),
                   child: txtUsuario,
                 ),
                 space,

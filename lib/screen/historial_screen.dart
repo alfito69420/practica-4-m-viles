@@ -53,7 +53,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
           'Historial de Reservaciones',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.blue[900],
+        backgroundColor: const Color(0xFF64CCF2),
       ),
       body: ValueListenableBuilder(
         valueListenable: AppNotifier.banRentas,
