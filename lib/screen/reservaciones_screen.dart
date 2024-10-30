@@ -24,14 +24,14 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/services.dart';
 
 class ReservacionesScreen extends StatefulWidget {
-  const ReservacionesScreen({Key? key}) : super(key: key);
+  const ReservacionesScreen({super.key});
 
   @override
   State<ReservacionesScreen> createState() => _ReservacionesScreenState();
 }
 
 class _ReservacionesScreenState extends State<ReservacionesScreen> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  final CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   ReservacionDatabase? reservacionDB;
@@ -68,7 +68,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
   Future<void> initializeNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
-    final InitializationSettings initializationSettings =
+    const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
     );
@@ -96,7 +96,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Reservaciones',
           style: TextStyle(color: Colors.white),
         ),
@@ -130,7 +130,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                       color: Colors.white,
                     ),
                     titleTextFormatter: (date, _) =>
-                        '${DateFormat('MMMM').format(date)}',
+                        DateFormat('MMMM').format(date),
                   ),
                   daysOfWeekStyle: const DaysOfWeekStyle(
                     weekdayStyle: TextStyle(color: Colors.white),
@@ -163,7 +163,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 ),
                 Expanded(
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(50),
                         topRight: Radius.circular(50),
@@ -201,12 +201,12 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                                         } else {
                                           if (userSnapshot.hasData) {
                                             return Container(
-                                              margin: EdgeInsets.symmetric(
+                                              margin: const EdgeInsets.symmetric(
                                                   vertical: 10),
                                               decoration: BoxDecoration(
                                                 border: Border.all(
                                                     color: Colors.grey[300]!),
-                                                borderRadius: BorderRadius.only(
+                                                borderRadius: const BorderRadius.only(
                                                   topRight: Radius.circular(20),
                                                   topLeft: Radius.circular(20),
                                                   bottomRight:
@@ -224,7 +224,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                                                       Expanded(
                                                         child: Padding(
                                                           padding:
-                                                              EdgeInsets.all(
+                                                              const EdgeInsets.all(
                                                                   15),
                                                           child: Column(
                                                             crossAxisAlignment:
@@ -234,7 +234,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                                                               Text(
                                                                 'Reservación de ${userSnapshot.data!.nombre!} ${userSnapshot.data!.apellido!}',
                                                                 style:
-                                                                    TextStyle(
+                                                                    const TextStyle(
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
@@ -244,12 +244,12 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                                                                         .ellipsis,
                                                                 maxLines: 1,
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                 height: 10,
                                                               ),
                                                               Row(
                                                                 children: [
-                                                                  Icon(Icons
+                                                                  const Icon(Icons
                                                                       .timer_sharp),
                                                                   Text(DateFormat(
                                                                           'HH:mm')
@@ -373,7 +373,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                                                     decoration: BoxDecoration(
                                                       color: getRandomColor(),
                                                       borderRadius:
-                                                          BorderRadius.only(
+                                                          const BorderRadius.only(
                                                         bottomLeft:
                                                             Radius.circular(20),
                                                         bottomRight:
@@ -396,7 +396,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                               ),
                             );
                           } else {
-                            return Text('Cargando...');
+                            return const Text('Cargando...');
                           }
                         }
                       },
@@ -413,12 +413,12 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         onPressed: () {
           modalReservacion(context, null);
         },
-        child: Icon(
+        backgroundColor: Colors.blue[900],
+        shape: const CircleBorder(),
+        child: const Icon(
           Icons.add,
           color: Colors.white,
         ),
-        backgroundColor: Colors.blue[900],
-        shape: CircleBorder(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
@@ -473,7 +473,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
           return null;
         },
         value: (conUsuario.text.isEmpty) ? null : conUsuario.text,
-        hint: Text('Seleccione un usuario'),
+        hint: const Text('Seleccione un usuario'),
         items: usuarios.map<DropdownMenuItem<String>>((value) {
           return DropdownMenuItem<String>(
             value: value.id_usuario.toString(),
@@ -488,7 +488,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
 
     //CategoriaDatabase categoriaDB = CategoriaDatabase();
     //List<CategoriaModel> categorias = await categoriaDB.getCategorias();
-    print('categoriaaas: ${categorias}');
+    //print('categoriaaas: ${categorias}');
 
     final txtCategoria = DropdownButtonFormField<String>(
       value: (conCategoria.text.isEmpty) ? null : conCategoria.text,
@@ -498,7 +498,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         }
         return null;
       },
-      hint: Text('Seleccione una categoría'),
+      hint: const Text('Seleccione una categoría'),
       items: categorias.map<DropdownMenuItem<String>>((value) {
         return DropdownMenuItem<String>(
           value: value.id_categoria.toString(),
@@ -507,11 +507,11 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
       }).toList(),
       onChanged: (String? value) {
         setState(() {
-          print('texto antes de: ${conCategoria.text}');
+          //print('texto antes de: ${conCategoria.text}');
           conCategoria.text = value!;
-          print('texto después de: ${conCategoria.text}');
+          //print('texto después de: ${conCategoria.text}');
           _futureAirbnb = AirbnbDatabase().getAirbnbByCategoria(int.parse(conCategoria.text));
-          print('newFutureAirbnb: ${_futureAirbnb.toString()}');
+          //print('newFutureAirbnb: ${_futureAirbnb.toString()}');
         });
       }
     );
@@ -634,7 +634,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
           }
         });
 
-    final space = SizedBox(
+    const space = SizedBox(
       height: 10,
     );
 
@@ -656,7 +656,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
               time.hour,
               time.minute,
             );
-            print('Fecha de notif ${scheduledDate}');
+            //print('Fecha de notif $scheduledDate');
             if (DateTime.now().isBefore(scheduledDate)) {
               NotificationService().scheduleNotification(
                   title: 'Evento próximo',
@@ -666,8 +666,8 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
             final horaIni24hrs = DateFormat('HH:mm:ss').format(DateFormat('hh:mm a').parse(conHoraIni.text));
             final horaFini24hrs = DateFormat('HH:mm:ss').format(DateFormat('hh:mm a').parse(conHoraFini.text));
             String status = '';
-            DateTime fechaIni = DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs);
-            DateTime fechaFini = DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs);
+            DateTime fechaIni = DateTime.parse('${conFechaIni.text} $horaIni24hrs');
+            DateTime fechaFini = DateTime.parse('${conFechaFini.text} $horaFini24hrs');
             if(DateTime.now().isBefore(fechaIni) && DateTime.now().isBefore(fechaFini)){
               status = 'Confirmada';
             } else if (DateTime.now().isAfter(fechaIni) && DateTime.now().isBefore(fechaFini)) {
@@ -693,7 +693,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
               reservacionDB!.insertReservacion(reserv).then((value) {
                 Navigator.pop(context);
                 String msj = "";
-                var snackbar;
+                SnackBar snackbar;
                 if (value > 0) {
                   AppNotifier.banEvents.value = !AppNotifier.banEvents.value;
                   msj = "Reservación insertada";
@@ -732,7 +732,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
               reservacionDB!.updateReservacion(reserv).then((value) {
                 Navigator.pop(context);
                 String msj = "";
-                var snackbar;
+                SnackBar snackbar;
                 if (value > 0) {
                   AppNotifier.banEvents.value = !AppNotifier.banEvents.value;
                   msj = "Reservación actualizada";
@@ -767,7 +767,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Usuario',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
@@ -777,7 +777,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 ),
                 space,
                 space,
-                Text(
+                const Text(
                   'Categorías',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
@@ -788,9 +788,9 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 StatefulBuilder(
                   builder:(context, StateSetter setState) {
                     if (conCategoria.text.isEmpty) {
-                      return SizedBox(height: 20,);
+                      return const SizedBox(height: 20,);
                     } else {
-                      print('La data: Borra la cuenta');
+                      //print('La data: Borra la cuenta');
                       return FutureBuilder(
                         key: ValueKey(conCategoria.text.toString()),
                         future: AirbnbDatabase().getAirbnbByCategoria(int.parse(conCategoria.text)),
@@ -801,20 +801,18 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                             );
                           } else {
                             if (snapshot.hasData) {
-                              print('La data: ${snapshot.data!}');
-                              return Container(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      space,
-                                      space,
-                                      Text(
-                                        'AirBnB',
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                                      ),
-                                      airbnbSelect(conAirbnb, snapshot.data!),
-                                    ],
+                              //print('La data: ${snapshot.data!}');
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  space,
+                                  space,
+                                  const Text(
+                                    'AirBnB',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                                   ),
+                                  airbnbSelect(conAirbnb, snapshot.data!),
+                                ],
                               );
                             } else {
                               return const Center(
@@ -829,7 +827,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 ),
                 space,
                 space,
-                Text(
+                const Text(
                   'Fecha y hora de Inicio',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
@@ -850,7 +848,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                   ],
                 ),
                 space,
-                Text(
+                const Text(
                   'Fecha y hora de Finalización',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
@@ -889,7 +887,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
   void _mostrarModalReservacion(ReservacionModel reservacion) async {
     // Obtener la fecha dos días antes del reservacion
     DateTime fechaInicio = reservacion.fecha_ini!;
-    DateTime twoDaysBeforeEvent = fechaInicio.subtract(Duration(days: 2));
+    DateTime twoDaysBeforeEvent = fechaInicio.subtract(const Duration(days: 2));
 
     // Almacenar una referencia al contexto
     BuildContext modalContext = context;
@@ -908,7 +906,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         return SingleChildScrollView(
           // SingleChildScrollView para permitir scroll
           child: Container(
-            padding: EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -916,7 +914,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.notifications),
+                      icon: const Icon(Icons.notifications),
                       onPressed: () {
                         _enviarNotificacionInstantanea(twoDaysBeforeEvent);
                       },
@@ -925,44 +923,44 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 ),
                 Text(
                   'Reservación de ${usuarioReserv!.nombre} ${usuarioReserv!.apellido}',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   'Fecha de Inicio: ${DateFormat('yyyy-MM-dd').format(reservacion.fecha_ini!.toLocal())}',
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
                 Text(
                   'Fecha de Finalización: ${DateFormat('yyyy-MM-dd').format(reservacion.fecha_fini!.toLocal())}',
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   'Descripción del AirBnB: ${airbnbReserv!.descripcion}',
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   'Detalles de la reservación:',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Divider(),
+                    const Divider(),
                     Text(
                       'Dirección: ${airbnbReserv.direccion}',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                     Text(
                       'Habitaciones reservadas: ${reservacion.habitaciones} de ${airbnbReserv.habitaciones}',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                     Text(
                       'Baños: ${airbnbReserv.banos}',
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
-                    Divider(),
+                    const Divider(),
                   ],
                 ),
                 // Mostrar detalles de la renta
@@ -1005,12 +1003,12 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 //     );
                 //   },
                 // ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(modalContext).pop();
                   },
-                  child: Text('Regresar a la lista de eventos'),
+                  child: const Text('Regresar a la lista de eventos'),
                 ),
               ],
             ),
@@ -1029,7 +1027,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         return null;
       },
       value: (conAirbnb.text.isEmpty) ? null : conAirbnb.text,
-      hint: Text('Seleccione una AirBnB'),
+      hint: const Text('Seleccione una AirBnB'),
       items: airbnb.map<DropdownMenuItem<String>>((value) {
         return DropdownMenuItem<String>(
           value: value.id_airbnb.toString(),
@@ -1041,7 +1039,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
       },
       selectedItemBuilder: (BuildContext context) {
         return airbnb.map<Widget>((value) {
-          return Container(
+          return SizedBox(
             width: double.infinity, // Asegúrate de que ocupe todo el ancho disponible
             child: Text(
               value.descripcion.toString(),
