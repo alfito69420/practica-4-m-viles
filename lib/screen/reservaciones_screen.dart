@@ -660,29 +660,25 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
             final horaFini24hrs = DateFormat('HH:mm:ss')
                 .format(DateFormat('hh:mm a').parse(conHoraFini.text));
             String status = '';
-            DateTime fechaIni =
-                DateTime.parse('${conFechaIni.text} $horaIni24hrs');
-            DateTime fechaFini =
-                DateTime.parse('${conFechaFini.text} $horaFini24hrs');
+            DateTime fechaIni = DateTime.parse('${conFechaIni.text} $horaIni24hrs');
+            DateTime fechaFini = DateTime.parse('${conFechaFini.text} $horaFini24hrs');
 
-            if (DateTime.now().isBefore(fechaIni) &&
-                DateTime.now().isBefore(fechaFini)) {
+            if (DateTime.now().isBefore(fechaIni) && DateTime.now().isBefore(fechaFini)) {
               status = 'Confirmada';
-            } else if (DateTime.now().isAfter(fechaIni) &&
-                DateTime.now().isBefore(fechaFini)) {
+            } else if (DateTime.now().isAfter(fechaIni) && DateTime.now().isBefore(fechaFini)) {
               status = 'Iniciada';
-            } else if (DateTime.now().isAfter(fechaIni) &&
-                DateTime.now().isAfter(fechaFini)) {
+            } else if (DateTime.now().isAfter(fechaIni) && DateTime.now().isAfter(fechaFini)) {
               status = 'Finalizada';
             }
             if (reservacion == null) {
-              print("ALBBBBBBBBBBBBBBB" + conUsuario.text);
+              //print("ALBBBBBBBBBBBBBBB" + conUsuario.text);
               ReservacionModel reserv = ReservacionModel(
-                fecha_ini:
-                    DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs),
-                fecha_fini:
-                    DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
-                estatus: 'Confirmada',
+                // fecha_ini: DateTime.parse(conFechaIni.text + ' ' + horaIni24hrs),
+                // fecha_fini: DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
+                // estatus: 'Confirmada',
+                fecha_ini: fechaIni,
+                fecha_fini: fechaFini,
+                estatus: status,
                 habitaciones: 1,
                 id_usuario: int.parse(conUsuario.text),
                 id_airbnb: int.parse(conAirbnb.text),
