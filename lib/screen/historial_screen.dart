@@ -54,7 +54,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
           'Historial de Reservaciones',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF64CCF2),
+        backgroundColor: const Color(0xFFE30F2C),
       ),
       body: ValueListenableBuilder(
         valueListenable: AppNotifier.banRentas,
@@ -386,7 +386,7 @@ class _HistorialScreenState extends State<HistorialScreen> {
 
     final btnAgregar = ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[900], foregroundColor: Colors.white),
+            backgroundColor: const Color(0xFFE30F2C), foregroundColor: Colors.white),
         onPressed: () {
           if(_keyForm.currentState!.validate()){
             ReservacionModel reserv2 = ReservacionModel(

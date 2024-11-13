@@ -26,7 +26,7 @@ class _NavigationBarAppState extends State<Navbar> {
           'Reservaciones',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF64CCF2),
+        backgroundColor: const Color(0xFFE30F2C),
         leading: IconButton(
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer(); // Abre el drawer
@@ -36,20 +36,6 @@ class _NavigationBarAppState extends State<Navbar> {
             color: Colors.white,
           ),
         ),
-/*        actions: [
-          GestureDetector(
-            onTap: () {},
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.ads_click_sharp,
-                ),
-              ),
-            ),
-          ),
-        ],*/
       ),
       body: IndexedStack(
         index: selectedIndex,
@@ -64,6 +50,7 @@ class _NavigationBarAppState extends State<Navbar> {
       child: ListView(
         children: [
           UserAccountsDrawerHeader(
+            decoration: BoxDecoration(color: Color(0xFFFE0F3F)),
             currentAccountPicture: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
                 child: const Image(image: AssetImage("assets/airbnb.jpg"))),

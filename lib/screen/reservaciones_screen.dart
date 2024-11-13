@@ -95,14 +95,6 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*appBar: AppBar(
-        centerTitle: true,
-        title: customText(
-          'Reservaciones',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF64CCF2),
-      ),*/
       body: ValueListenableBuilder(
         valueListenable: AppNotifier.banEvents,
         builder: (context, value, _) {
@@ -111,8 +103,8 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
             child: Column(
               children: [
                 TableCalendar(
-                  firstDay: DateTime.utc(2010, 10, 16),
-                  lastDay: DateTime.utc(2030, 3, 14),
+                  firstDay: DateTime.utc(2024, 1, 1),
+                  lastDay: DateTime.utc(2030, 12, 31),
                   daysOfWeekHeight: 20,
                   focusedDay: _focusedDay,
                   calendarFormat: _calendarFormat,
@@ -143,12 +135,12 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                       markerDecoration: BoxDecoration(
                           color: Colors.black54, shape: BoxShape.circle),
                       selectedDecoration: BoxDecoration(
-                        color: Color(0xFF2197E1),
+                        color: Color(0xFFD91329),
                         //color: Colors.amberAccent),
                         shape: BoxShape.circle,
                       ),
                       todayDecoration: BoxDecoration(
-                        color: Color(0xFF30BCED),
+                        color: Color(0xFFFA3A61),
                         shape: BoxShape.circle,
                       )),
                   selectedDayPredicate: (day) {
@@ -398,7 +390,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         onPressed: () {
           modalReservacion(context, null);
         },
-        backgroundColor: const Color(0xFF64CCF2),
+        backgroundColor: const Color(0xFFE30F2C),
         shape: const CircleBorder(),
         child: const Icon(
           Icons.add,
@@ -424,7 +416,6 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
     final conAirbnb = TextEditingController();
     final conFechaIni = TextEditingController();
     final conFechaFini = TextEditingController();
-    //final conCategoria = TextEditingController();
     final conHoraIni = TextEditingController();
     final conHoraFini = TextEditingController();
     final _keyForm = GlobalKey<FormState>();
@@ -445,10 +436,6 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
           DateFormat('yyyy-MM-dd').format(reservacion.fecha_fini!.toLocal());
       conHoraFini.text =
           DateFormat('h:mm a').format(reservacion.fecha_fini!.toLocal());
-      // conFechaIni.text = reservacion.fecha_evento!.split(' ')[0];
-      // conFechaFini.text = reservacion.fecha_evento!;
-      // conHora.text = reservacion.fecha_evento!.split(' ')[1];
-      // conRenta.text = reservacion.renta_id!.toString();
     }
 
     UsuarioDatabase usuarioDB = UsuarioDatabase();
@@ -475,10 +462,6 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
               .firstWhere((usuario) => usuario.id_usuario.toString() == value);
         });
 
-    //CategoriaDatabase categoriaDB = CategoriaDatabase();
-    //List<CategoriaModel> categorias = await categoriaDB.getCategorias();
-    //print('categoriaaas: ${categorias}');
-
     final txtCategoria = DropdownButtonFormField<String>(
         value: (conCategoria.text.isEmpty) ? null : conCategoria.text,
         validator: (value) {
@@ -496,12 +479,9 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         }).toList(),
         onChanged: (String? value) {
           setState(() {
-            //print('texto antes de: ${conCategoria.text}');
             conCategoria.text = value!;
-            //print('texto después de: ${conCategoria.text}');
             _futureAirbnb = AirbnbDatabase()
                 .getAirbnbByCategoria(int.parse(conCategoria.text));
-            //print('newFutureAirbnb: ${_futureAirbnb.toString()}');
           });
         });
 
@@ -522,9 +502,9 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(
               context: context,
-              initialDate: DateTime.now(), //get today's date
+              initialDate: DateTime.now(),
               firstDate: DateTime(
-                  2000), //DateTime.now() - not to allow to choose before today.
+                  2000),
               lastDate: DateTime(2101));
 
           if (pickedDate != null) {
@@ -581,9 +561,9 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(
               context: context,
-              initialDate: DateTime.now(), //get today's date
+              initialDate: DateTime.now(),
               firstDate: DateTime(
-                  2000), //DateTime.now() - not to allow to choose before today.
+                  2000),
               lastDate: DateTime(2101));
 
           if (pickedDate != null) {
@@ -629,7 +609,7 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
 
     final btnAgregar = ElevatedButton.icon(
         style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF64CCF2),
+            backgroundColor: const Color(0xFFE30F2C),
             foregroundColor: Colors.white),
         onPressed: () {
           selectedUser ??= usuarios.firstWhere(
@@ -684,8 +664,8 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                     DateTime.parse(conFechaFini.text + ' ' + horaFini24hrs),
                 estatus: 'Confirmada',
                 habitaciones: 1,
-                id_usuario: int.parse(conUsuario.text),
-                id_airbnb: int.parse(conAirbnb.text),
+                id_usuario: int.parse(conUsuario.text) ?? 0,
+                id_airbnb: int.parse(conAirbnb.text) ?? 0,
               );
               if (kReservs[DateTime.parse(conFechaIni.text)] == null) {
                 kReservs[DateTime.parse(conFechaIni.text)] = [];
@@ -858,7 +838,8 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                 midMarginTop(),
                 customText(
                   'Fecha y hora de Finalización',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 Row(
                   children: [
@@ -971,46 +952,6 @@ class _ReservacionesScreenState extends State<ReservacionesScreen> {
                     const Divider(),
                   ],
                 ),
-                // Mostrar detalles de la renta
-                // ListView.builder(
-                //   shrinkWrap: true,
-                //   physics: NeverScrollableScrollPhysics(),
-                //   itemCount: detallesRenta.length,
-                //   itemBuilder: (context, index) {
-                //     int? mobiliarioId = detallesRenta[index].mobiliario_id;
-                //     return FutureBuilder(
-                //       future: MobiliarioDatabase().getMobiliario(mobiliarioId!),
-                //       builder:
-                //           (context, AsyncSnapshot<MobiliarioModel?> snapshot) {
-                //         if (snapshot.hasData && snapshot.data != null) {
-                //           return Column(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               Divider(),
-                //               Text(
-                //                 'Mobiliario ID: $mobiliarioId',
-                //                 style: TextStyle(fontSize: 16),
-                //               ),
-                //               Text(
-                //                 'Cantidad: ${detallesRenta[index].cantidad}',
-                //                 style: TextStyle(fontSize: 16),
-                //               ),
-                //               Text(
-                //                 'Nombre: ${snapshot.data!.nombre_mobiliario}',
-                //                 style: TextStyle(fontSize: 16),
-                //               ),
-                //               Divider(),
-                //             ],
-                //           );
-                //         } else if (snapshot.hasError) {
-                //           return Text("Error: ${snapshot.error}");
-                //         } else {
-                //           return CircularProgressIndicator();
-                //         }
-                //       },
-                //     );
-                //   },
-                // ),
                 maxMarginTop(),
                 ElevatedButton(
                   onPressed: () {
